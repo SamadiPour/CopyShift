@@ -15,6 +15,7 @@ dependencies:
   super_clipboard: ^0.8.2+1
   launch_at_startup: ^0.2.2
   macos_ui: ^2.0.2
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:
