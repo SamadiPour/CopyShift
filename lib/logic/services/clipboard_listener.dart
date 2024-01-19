@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:super_clipboard/super_clipboard.dart';
+import 'package:copy_shift/logic/services/clipboard_action.dart';
 
 abstract class ClipboardListener {
   final StreamController<String> _controller = StreamController();
@@ -17,9 +17,13 @@ abstract class ClipboardListener {
 }
 
 class ClipboardListenerPulling extends ClipboardListener {
-  final _clipboard = SystemClipboard.instance!;
+  final ClipboardAction _clipboardAction;
   Timer? _timer;
   String? _lastSeen;
+
+  ClipboardListenerPulling({
+    required ClipboardAction clipboardAction,
+  }): _clipboardAction = clipboardAction;
 
   @override
   void listen() {
@@ -30,9 +34,13 @@ class ClipboardListenerPulling extends ClipboardListener {
   }
 
   void _checkLatest() async {
-    final reader = await _clipboard.read();
-    final value = await reader.readValue(Formats.plainText);
-    if (value == null) return;
+    final value = await _clipboardAction.readString();
+    if (value == null) {
+      return;
+    }
+
+    // check if value has changed since last time
+    // and send it to the stream if it's new
     if (value != _lastSeen) {
       _lastSeen = value;
       _controller.add(value);
